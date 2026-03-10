@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Central de Vendas — Tempo Real</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<header>
+  <div class="logo">Central de <span>Vendas</span></div>
+
+  <div class="ws-status">
+    <div class="ws-dot disconnected" id="wsDot"></div>
+    <span id="wsLabel">Desconectado</span>
+  </div>
+
+  <div class="header-time" id="clock">--:--:--</div>
+</header>
+
+<main>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card" id="card-faturamento">
+      <div class="kpi-label">Faturamento Hoje</div>
+      <div class="kpi-value" id="kpi-faturamento">R$ 0</div>
+      <div class="kpi-delta" id="delta-faturamento">— aguardando dados</div>
+    </div>
+    <div class="kpi-card" id="card-campanhas">
+      <div class="kpi-label">Campanhas Ativas</div>
+      <div class="kpi-value" id="kpi-campanhas">0</div>
+      <div class="kpi-delta" id="delta-campanhas">— aguardando dados</div>
+    </div>
+    <div class="kpi-card" id="card-impressoes">
+      <div class="kpi-label">Impressões / hora</div>
+      <div class="kpi-value" id="kpi-impressoes">0</div>
+      <div class="kpi-delta" id="delta-impressoes">— aguardando dados</div>
+    </div>
+    <div class="kpi-card" id="card-conversoes">
+      <div class="kpi-label">Conversões</div>
+      <div class="kpi-value" id="kpi-conversoes">0</div>
+      <div class="kpi-delta" id="delta-conversoes">— aguardando dados</div>
+    </div>
+  </div>
+
+  <!-- MIDDLE: gráfico de barras + feed de vendas -->
+  <div class="middle-row">
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Faturamento por Hora</span>
+        <span class="badge" id="badge-hoje">hoje</span>
+      </div>
+      <div class="bar-chart" id="barChart">
+        <div class="placeholder-msg">aguardando conexão...</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Vendas em Tempo Real</span>
+        <span class="badge" id="badge-feed">live</span>
+      </div>
+      <div class="feed" id="feed">
+        <div class="placeholder-msg" style="text-align:center;padding:20px 0;">
+          aguardando conexão...
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM: top clientes + logs + online -->
+  <div class="bottom-row">
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Top Clientes</span>
+      </div>
+      <div class="rank-list" id="rankList">
+        <div class="placeholder-msg">aguardando conexão...</div>
+      </div>
+    </div>
+
+    <div class="panel panel-side">
+      <div class="panel-header">
+        <span class="panel-title">Usuários Online</span>
+        <span class="badge">WebSocket</span>
+      </div>
+      <div class="online-count" id="onlineCount">—</div>
+      <div class="online-label">conectados agora</div>
+
+      <div class="log-section">
+        <div class="panel-header" style="margin-bottom:10px;">
+          <span class="panel-title">Log de Conexão</span>
+        </div>
+        <div class="log-list" id="logList">
+          <div class="log-item">
+            <span class="log-time">--:--:--</span>
+            <span class="log-msg data">aguardando servidor...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

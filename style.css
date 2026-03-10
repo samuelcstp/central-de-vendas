@@ -1,0 +1,434 @@
+/* ================================================================
+   CENTRAL DE VENDAS — style.css
+   ================================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0a0a0f;
+  --surface: #13131a;
+  --border:  #1e1e2e;
+  --accent:  #e8ff47;
+  --accent2: #ff6b35;
+  --accent3: #00d4ff;
+  --text:    #f0f0f5;
+  --muted:   #6b6b80;
+  --green:   #39ff85;
+  --red:     #ff3d6b;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── PLACEHOLDER ── */
+.placeholder-msg {
+  color: var(--muted);
+  font-size: 0.75rem;
+  margin: auto;
+}
+
+/* ── HEADER ── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 36px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: rgba(10,10,15,0.92);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.logo span { color: var(--accent); }
+
+.ws-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--surface);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.ws-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: background 0.4s;
+}
+.ws-dot.connected    { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+.ws-dot.disconnected { background: var(--red); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.header-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ── LAYOUT ── */
+main {
+  padding: 32px 36px;
+  display: grid;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── KPI CARDS ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px 22px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+/* Linha colorida no topo de cada card */
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+}
+.kpi-card:nth-child(2)::after { background: var(--accent2); }
+.kpi-card:nth-child(3)::after { background: var(--accent3); }
+.kpi-card:nth-child(4)::after { background: var(--green); }
+
+.kpi-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* Bebas Neue dá altura e impacto sem ser condensado */
+.kpi-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.2rem;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  transition: all 0.4s;
+}
+
+.kpi-delta {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  margin-top: 10px;
+  color: var(--green);
+}
+.kpi-delta.down { color: var(--red); }
+
+.kpi-flash { animation: flash 0.6s ease; }
+
+@keyframes flash {
+  0%   { background: rgba(232, 255, 71, 0.08); }
+  100% { background: transparent; }
+}
+
+/* ── MIDDLE ROW ── */
+.middle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* ── PANELS ── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.panel-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.panel-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(232, 255, 71, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(232, 255, 71, 0.2);
+}
+
+/* ── GRÁFICO DE BARRAS ── */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 100px;
+}
+
+.bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 100%;
+  background: var(--accent);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.6s cubic-bezier(.34,1.56,.64,1);
+  min-height: 4px;
+  opacity: 0.85;
+}
+
+.bar-wrap:nth-child(even) .bar  { background: var(--accent2); opacity: 0.7; }
+.bar-wrap:nth-child(3n)   .bar  { background: var(--accent3); opacity: 0.7; }
+
+.bar-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--muted);
+}
+
+/* ── FEED DE VENDAS ── */
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.feed-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.feed-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.feed-info  { flex: 1; min-width: 0; }
+
+.feed-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.feed-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* ── BOTTOM ROW ── */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+/* ── RANKING TOP CLIENTES ── */
+.rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.rank-item:last-child { border-bottom: none; }
+
+.rank-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  width: 18px;
+  text-align: center;
+}
+.rank-num.gold { color: var(--accent); font-weight: 700; }
+
+.rank-bar-wrap {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.rank-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.7s ease;
+}
+.rank-item:nth-child(2) .rank-bar { background: var(--accent2); }
+.rank-item:nth-child(3) .rank-bar { background: var(--accent3); }
+.rank-item:nth-child(n+4) .rank-bar { background: var(--muted); }
+
+.rank-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  min-width: 110px;
+}
+
+.rank-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── USUÁRIOS ONLINE ── */
+.online-count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: var(--accent3);
+  text-align: center;
+  margin: 8px 0 4px;
+}
+
+.online-label {
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── LOG DE CONEXÃO ── */
+.log-section { margin-top: 24px; }
+
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.log-item {
+  display: flex;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  animation: slideIn 0.3s ease;
+}
+
+.log-time        { color: var(--muted); flex-shrink: 0; }
+.log-msg.in      { color: var(--green); }
+.log-msg.out     { color: var(--red); }
+.log-msg.data    { color: var(--accent3); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .kpi-grid              { grid-template-columns: repeat(2, 1fr); }
+  .middle-row, .bottom-row { grid-template-columns: 1fr; }
+  main                   { padding: 20px 16px; }
+  header                 { padding: 16px 20px; }
+  .kpi-value             { font-size: 2.6rem; }
+}
