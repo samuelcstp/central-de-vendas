@@ -1,114 +1,327 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Central de Vendas — Tempo Real</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
-<header>
-  <div class="logo">Central de <span>Vendas</span></div>
+  <header>
+    <div class="logo">Central de <span>Vendas</span></div>
 
-  <div class="ws-status">
-    <div class="ws-dot disconnected" id="wsDot"></div>
-    <span id="wsLabel">Desconectado</span>
-  </div>
-
-  <div class="header-time" id="clock">--:--:--</div>
-</header>
-
-<main>
-
-  <!-- KPI CARDS -->
-  <div class="kpi-grid">
-    <div class="kpi-card" id="card-faturamento">
-      <div class="kpi-label">Faturamento Hoje</div>
-      <div class="kpi-value" id="kpi-faturamento">R$ 0</div>
-      <div class="kpi-delta" id="delta-faturamento">— aguardando dados</div>
+    <div class="ws-status">
+      <div class="ws-dot disconnected" id="wsDot"></div>
+      <span id="wsLabel">Desconectado</span>
     </div>
-    <div class="kpi-card" id="card-campanhas">
-      <div class="kpi-label">Campanhas Ativas</div>
-      <div class="kpi-value" id="kpi-campanhas">0</div>
-      <div class="kpi-delta" id="delta-campanhas">— aguardando dados</div>
-    </div>
-    <div class="kpi-card" id="card-impressoes">
-      <div class="kpi-label">Impressões / hora</div>
-      <div class="kpi-value" id="kpi-impressoes">0</div>
-      <div class="kpi-delta" id="delta-impressoes">— aguardando dados</div>
-    </div>
-    <div class="kpi-card" id="card-conversoes">
-      <div class="kpi-label">Conversões</div>
-      <div class="kpi-value" id="kpi-conversoes">0</div>
-      <div class="kpi-delta" id="delta-conversoes">— aguardando dados</div>
-    </div>
-  </div>
 
-  <!-- MIDDLE: gráfico de barras + feed de vendas -->
-  <div class="middle-row">
+    <div class="header-time" id="clock">--:--:--</div>
+  </header>
 
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">Faturamento por Hora</span>
-        <span class="badge" id="badge-hoje">hoje</span>
+  <main>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card" id="card-faturamento">
+        <div class="kpi-label">Faturamento Hoje</div>
+        <div class="kpi-value" id="kpi-faturamento">R$ 0</div>
+        <div class="kpi-delta" id="delta-faturamento">— aguardando dados</div>
       </div>
-      <div class="bar-chart" id="barChart">
-        <div class="placeholder-msg">aguardando conexão...</div>
+      <div class="kpi-card" id="card-campanhas">
+        <div class="kpi-label">Campanhas Ativas</div>
+        <div class="kpi-value" id="kpi-campanhas">0</div>
+        <div class="kpi-delta" id="delta-campanhas">— aguardando dados</div>
+      </div>
+      <div class="kpi-card" id="card-impressoes">
+        <div class="kpi-label">Impressões / hora</div>
+        <div class="kpi-value" id="kpi-impressoes">0</div>
+        <div class="kpi-delta" id="delta-impressoes">— aguardando dados</div>
+      </div>
+      <div class="kpi-card" id="card-conversoes">
+        <div class="kpi-label">Conversões</div>
+        <div class="kpi-value" id="kpi-conversoes">0</div>
+        <div class="kpi-delta" id="delta-conversoes">— aguardando dados</div>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">Vendas em Tempo Real</span>
-        <span class="badge" id="badge-feed">live</span>
-      </div>
-      <div class="feed" id="feed">
-        <div class="placeholder-msg" style="text-align:center;padding:20px 0;">
-          aguardando conexão...
+    <!-- MIDDLE: gráfico de barras + feed de vendas -->
+    <div class="middle-row">
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Faturamento por Hora</span>
+          <span class="badge" id="badge-hoje">hoje</span>
+        </div>
+        <div class="bar-chart" id="barChart">
+          <div class="placeholder-msg">aguardando conexão...</div>
         </div>
       </div>
-    </div>
 
-  </div>
-
-  <!-- BOTTOM: top clientes + logs + online -->
-  <div class="bottom-row">
-
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">Top Clientes</span>
-      </div>
-      <div class="rank-list" id="rankList">
-        <div class="placeholder-msg">aguardando conexão...</div>
-      </div>
-    </div>
-
-    <div class="panel panel-side">
-      <div class="panel-header">
-        <span class="panel-title">Usuários Online</span>
-        <span class="badge">WebSocket</span>
-      </div>
-      <div class="online-count" id="onlineCount">—</div>
-      <div class="online-label">conectados agora</div>
-
-      <div class="log-section">
-        <div class="panel-header" style="margin-bottom:10px;">
-          <span class="panel-title">Log de Conexão</span>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Vendas em Tempo Real</span>
+          <span class="badge" id="badge-feed">live</span>
         </div>
-        <div class="log-list" id="logList">
-          <div class="log-item">
-            <span class="log-time">--:--:--</span>
-            <span class="log-msg data">aguardando servidor...</span>
+        <div class="feed" id="feed">
+          <div class="placeholder-msg" style="text-align:center;padding:20px 0;">
+            aguardando conexão...
           </div>
         </div>
       </div>
+
     </div>
 
-  </div>
-</main>
+    <!-- BOTTOM: top clientes + logs + online -->
+    <div class="bottom-row">
 
-<script src="app.js"></script>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Top Clientes</span>
+        </div>
+        <div class="rank-list" id="rankList">
+          <div class="placeholder-msg">aguardando conexão...</div>
+        </div>
+      </div>
+
+      <div class="panel panel-side">
+        <div class="panel-header">
+          <span class="panel-title">Usuários Online</span>
+          <span class="badge">WebSocket</span>
+        </div>
+        <div class="online-count" id="onlineCount">—</div>
+        <div class="online-label">conectados agora</div>
+
+        <div class="log-section">
+          <div class="panel-header" style="margin-bottom:10px;">
+            <span class="panel-title">Log de Conexão</span>
+          </div>
+          <div class="log-list" id="logList">
+            <div class="log-item">
+              <span class="log-time">--:--:--</span>
+              <span class="log-msg data">aguardando servidor...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    /* ================================================================
+       CENTRAL DE VENDAS — WebSocket Client
+       ================================================================ */
+
+    const WS_URL = `ws://${location.host}`;
+
+    /* ── RELÓGIO ── */
+    function updateClock() {
+      document.getElementById('clock').textContent =
+        new Date().toLocaleTimeString('pt-BR');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* ================================================================
+     * WEBSOCKET
+     * Conecta ao servidor e reconecta automaticamente se cair.
+     * ================================================================ */
+    let ws = null;
+
+    function conectar() {
+      ws = new WebSocket(WS_URL);
+
+      ws.onopen = () => {
+        setStatus('connected', 'Conectado');
+        addLog('Conexão estabelecida', 'in');
+      };
+
+      ws.onclose = () => {
+        setStatus('disconnected', 'Desconectado');
+        addLog('Conexão encerrada', 'out');
+        setTimeout(conectar, 3000);
+      };
+
+      ws.onerror = () => {
+        addLog('Erro na conexão WebSocket', 'out');
+      };
+
+      ws.onmessage = (event) => {
+        let msg;
+        try { msg = JSON.parse(event.data); }
+        catch { return; }
+
+        switch (msg.type) {
+
+          case 'init':
+            if (msg.kpis) renderKPIs(msg.kpis);
+            if (msg.porHora) renderBarras(msg.porHora);
+            if (msg.topClientes) renderTop(msg.topClientes);
+            if (msg.vendas) msg.vendas.slice(0, 10).forEach(v => addFeedItem(v, false));
+            addLog('Dados iniciais recebidos', 'data');
+            break;
+
+          case 'venda':
+            if (msg.venda) addFeedItem(msg.venda, true);
+            if (msg.kpis) renderKPIs(msg.kpis, true);
+            if (msg.topClientes) renderTop(msg.topClientes);
+            if (msg.porHora) renderBarras(msg.porHora);
+            addLog(`Nova venda: ${msg.venda?.cliente ?? ''}`, 'data');
+            break;
+
+          case 'kpis':
+            if (msg.kpis) renderKPIs(msg.kpis, true);
+            break;
+
+          case 'usuarios':
+            document.getElementById('onlineCount').textContent = msg.count ?? '—';
+            addLog(`${msg.count} usuário(s) online`, 'data');
+            break;
+        }
+      };
+    }
+
+    /* ================================================================
+       HELPERS DE UI
+       ================================================================ */
+
+    function setStatus(state, label) {
+      document.getElementById('wsDot').className = `ws-dot ${state}`;
+      document.getElementById('wsLabel').textContent = label;
+    }
+
+    function fmt(val) {
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency', currency: 'BRL',
+        minimumFractionDigits: 0, maximumFractionDigits: 0
+      }).format(val);
+    }
+
+    function fmtNum(val) {
+      return new Intl.NumberFormat('pt-BR').format(val);
+    }
+
+    function addLog(msg, tipo) {
+      const list = document.getElementById('logList');
+      const time = new Date().toLocaleTimeString('pt-BR');
+      const el = document.createElement('div');
+      el.className = 'log-item';
+      el.innerHTML = `<span class="log-time">${time}</span><span class="log-msg ${tipo}">${msg}</span>`;
+      list.insertBefore(el, list.firstChild);
+      while (list.children.length > 50) list.removeChild(list.lastChild);
+    }
+
+    function flashCard(id) {
+      const card = document.getElementById(`card-${id}`);
+      if (!card) return;
+      card.classList.remove('kpi-flash');
+      void card.offsetWidth;
+      card.classList.add('kpi-flash');
+    }
+
+    /* ================================================================
+       RENDER FUNCTIONS
+       ================================================================ */
+
+    function renderKPIs(kpis, animate = false) {
+      const set = (elId, formatted, deltaId, deltaVal) => {
+        const el = document.getElementById(elId);
+        if (el) {
+          el.textContent = formatted;
+          if (animate) flashCard(elId.replace('kpi-', ''));
+        }
+        const d = document.getElementById(deltaId);
+        if (d && deltaVal !== undefined) {
+          d.textContent = deltaVal;
+          d.className = 'kpi-delta' + (String(deltaVal).startsWith('-') ? ' down' : '');
+        }
+      };
+
+      set('kpi-faturamento', fmt(kpis.faturamento), 'delta-faturamento', kpis.deltaFaturamento ?? '');
+      set('kpi-campanhas', kpis.campanhas, 'delta-campanhas', kpis.deltaCampanhas ?? '');
+      set('kpi-impressoes', fmtNum(kpis.impressoes), 'delta-impressoes', kpis.deltaImpressoes ?? '');
+      set('kpi-conversoes', fmtNum(kpis.conversoes), 'delta-conversoes', kpis.deltaConversoes ?? '');
+    }
+
+    function renderBarras(porHora) {
+      const container = document.getElementById('barChart');
+      if (!porHora?.length) return;
+      const maxVal = Math.max(...porHora.map(h => h.valor), 1);
+      container.innerHTML = '';
+      porHora.forEach(h => {
+        const pct = Math.round((h.valor / maxVal) * 100);
+        const wrap = document.createElement('div');
+        wrap.className = 'bar-wrap';
+        wrap.innerHTML = `
+      <div class="bar" style="height:${pct}%"></div>
+      <div class="bar-label">${h.hora}</div>
+    `;
+        container.appendChild(wrap);
+      });
+    }
+
+    function renderTop(clientes) {
+      const list = document.getElementById('rankList');
+      if (!clientes?.length) return;
+      const maxVal = Math.max(...clientes.map(c => c.valor), 1);
+      const medalhas = ['🥇', '🥈', '🥉'];
+      list.innerHTML = clientes.map((c, i) => `
+    <div class="rank-item">
+      <span class="rank-num ${i === 0 ? 'gold' : ''}">${medalhas[i] ?? i + 1}</span>
+      <span class="rank-name">${c.nome}</span>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar" style="width:${Math.round((c.valor / maxVal) * 100)}%"></div>
+      </div>
+      <span class="rank-val">${fmt(c.valor)}</span>
+    </div>
+  `).join('');
+    }
+
+    const CORES_CANAL = {
+      'Instagram': '#833ab4',
+      'YouTube': '#ff0000',
+      'Google Ads': '#4285f4',
+      'TikTok': '#69c9d0',
+      'LinkedIn': '#0077b5',
+      'TV': '#ff6b35',
+      'Rádio': '#ffc107',
+      'OOH': '#39ff85',
+    };
+
+    function addFeedItem(venda, animate = true) {
+      const feed = document.getElementById('feed');
+
+      const placeholder = feed.querySelector('.placeholder-msg');
+      if (placeholder) placeholder.remove();
+
+      const cor = CORES_CANAL[venda.canal] ?? '#6b6b80';
+      const item = document.createElement('div');
+      item.className = 'feed-item';
+      item.style.borderLeft = `3px solid ${cor}`;
+      item.innerHTML = `
+    <div class="feed-icon" style="background:${cor}22">${venda.emoji ?? '📢'}</div>
+    <div class="feed-info">
+      <div class="feed-name">${venda.cliente}</div>
+      <div class="feed-sub">${venda.campanha} · ${venda.canal}</div>
+    </div>
+    <div class="feed-value">${fmt(venda.valor)}</div>
+  `;
+
+      if (animate) feed.insertBefore(item, feed.firstChild);
+      else feed.appendChild(item);
+
+      while (feed.children.length > 50) feed.removeChild(feed.lastChild);
+    }
+
+    /* ── INICIA ── */
+    conectar();
+  </script>
 </body>
+
 </html>
