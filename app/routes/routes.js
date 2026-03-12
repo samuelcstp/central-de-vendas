@@ -10,6 +10,6 @@ router.use(express.json());
 router.use('/api/auth', authRoutes);
 router.use('/api/vendas', vendaRoutes);
 
-router.use(express.static(path.join(__dirname, '../../')));
+router.use(express.static(path.join(__dirname, '../../view')));
 
 module.exports = router;

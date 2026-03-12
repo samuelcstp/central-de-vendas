@@ -20,7 +20,7 @@ const authController = {
 
             const vendedor = await VendedorRepository.criar(nome, email, senha);
 
-            const token = jwt.sign({ id: vendedor.id, email: vendedor.email, nome: vendedor.nome }, JWT_SECRET, { expiresIn: '7d' });
+            const token = jwt.sign({ id: vendedor.id, email: vendedor.email, nome: vendedor.nome }, JWT_SECRET, { expiresIn: '30m' });
 
             res.status(201).json({ token, vendedor });
         } catch (error) {
@@ -47,7 +47,7 @@ const authController = {
                 return res.status(401).json({ error: 'Credenciais inválidas' });
             }
 
-            const token = jwt.sign({ id: vendedor.id, email: vendedor.email, nome: vendedor.nome }, JWT_SECRET, { expiresIn: '7d' });
+            const token = jwt.sign({ id: vendedor.id, email: vendedor.email, nome: vendedor.nome }, JWT_SECRET, { expiresIn: '30m' });
 
             res.json({ token, vendedor: { id: vendedor.id, nome: vendedor.nome, email: vendedor.email } });
         } catch (error) {

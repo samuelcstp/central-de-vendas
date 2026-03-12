@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Central de Vendas — Tempo Real</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">Central de <span>Vendas</span></div>
+
+    <div class="ws-status">
+      <div class="ws-dot disconnected" id="wsDot"></div>
+      <span id="wsLabel">Desconectado</span>
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div class="header-time" id="clock">--:--:--</div>
+      <button onclick="document.getElementById('modalVenda').style.display='flex'" class="btn-primary"
+        style="padding: 8px 16px; margin: 0; font-size: 0.8rem;">+ Registrar Venda</button>
+      <button onclick="logout()" class="btn-primary"
+        style="padding: 8px 16px; margin: 0; font-size: 0.8rem; background: var(--surface); color: var(--text); border: 1px solid var(--border);">Sair</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card" id="card-faturamento">
+        <div class="kpi-label">Faturamento Hoje</div>
+        <div class="kpi-value" id="kpi-faturamento">R$ 0</div>
+        <div class="kpi-delta" id="delta-faturamento">— aguardando dados</div>
+      </div>
+      <div class="kpi-card" id="card-vendas-hoje">
+        <div class="kpi-label">Vendas Hoje</div>
+        <div class="kpi-value" id="kpi-vendas-hoje">0</div>
+        <div class="kpi-delta" id="delta-vendas-hoje">— aguardando dados</div>
+      </div>
+      <div class="kpi-card" id="card-ticket-medio">
+        <div class="kpi-label">Ticket Médio</div>
+        <div class="kpi-value" id="kpi-ticket-medio">R$ 0</div>
+        <div class="kpi-delta" id="delta-ticket-medio">— aguardando dados</div>
+      </div>
+    </div>
+
+    <!-- MIDDLE: gráfico de barras + feed de vendas -->
+    <div class="middle-row">
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Faturamento por Hora</span>
+          <span class="badge" id="badge-hoje">hoje</span>
+        </div>
+        <div class="bar-chart" id="barChart">
+          <div class="placeholder-msg">aguardando conexão...</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Vendas em Tempo Real</span>
+          <span class="badge" id="badge-feed">live</span>
+        </div>
+        <div class="feed" id="feed">
+          <div class="placeholder-msg" style="text-align:center;padding:20px 0;">
+            aguardando conexão...
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM: top clientes + logs + online -->
+    <div class="bottom-row">
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Top Clientes</span>
+        </div>
+        <div class="rank-list" id="rankList">
+          <div class="placeholder-msg">aguardando conexão...</div>
+        </div>
+      </div>
+
+      <div class="panel panel-side">
+        <div class="panel-header">
+          <span class="panel-title">Usuários Online</span>
+          <span class="badge">WebSocket</span>
+        </div>
+        <div class="online-count" id="onlineCount">—</div>
+        <div class="online-label">conectados agora</div>
+
+        <div class="log-section">
+          <div class="panel-header" style="margin-bottom:10px;">
+            <span class="panel-title">Log de Conexão</span>
+          </div>
+          <div class="log-list" id="logList">
+            <div class="log-item">
+              <span class="log-time">--:--:--</span>
+              <span class="log-msg data">aguardando servidor...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="modalVenda"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999; align-items:center; justify-content:center;">
+    <div class="panel" style="width: 100%; max-width: 400px; position:relative;">
+      <div class="panel-header">
+        <span class="panel-title">Registrar Nova Venda</span>
+        <span style="cursor:pointer; font-family:'DM Mono', monospace; font-size: 1rem; color: var(--muted);"
+          onclick="document.getElementById('modalVenda').style.display='none'">X</span>
+      </div>
+      <form id="formVenda" onsubmit="enviarVenda(event)" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="input-group">
+          <label>Cliente</label>
+          <input type="text" id="vendaCliente" required placeholder="Nome do cliente" />
+        </div>
+        <div class="input-group">
+          <label>Campanha</label>
+          <input type="text" id="vendaCampanha" required placeholder="Ex: Black Friday" />
+        </div>
+        <div class="input-group">
+          <label>Canal</label>
+          <select id="vendaCanal" required>
+            <option value="Instagram">Instagram</option>
+            <option value="YouTube">YouTube</option>
+            <option value="Google Ads">Google Ads</option>
+            <option value="TikTok">TikTok</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="TV">TV</option>
+            <option value="Rádio">Rádio</option>
+            <option value="OOH">OOH</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Valor (R$)</label>
+          <input type="number" step="0.01" id="vendaValor" required placeholder="0.00" />
+        </div>
+        <button type="submit" class="btn-primary">Registrar Venda</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
+</html>
