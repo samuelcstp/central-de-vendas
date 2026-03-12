@@ -5,7 +5,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const dados = { ...req.body, vendedor_id: req.vendedor.id };
+        const dados = { ...req.body, vendedor_id: req.vendedor.id, vendedor_nome: req.vendedor.nome };
         const venda = await vendaController.registrar(dados);
 
         // Emita a venda para os WebSockets usando o event emitter global ou passamos a req

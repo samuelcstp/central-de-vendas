@@ -22,7 +22,17 @@ class VendaRepository {
 
     static async getTopClientes(top = 5) {
         return new Promise((resolve, reject) => {
-            db.all(`SELECT cliente as nome, SUM(valor) as valor FROM vendas GROUP BY cliente ORDER BY valor DESC LIMIT ?`, [top], (err, rows) => {
+            db.all(`
+                SELECT 
+                    v.cliente as nome, 
+                    SUM(v.valor) as valor, 
+                    MAX(vd.nome) as vendedor_nome 
+                FROM vendas v 
+                LEFT JOIN vendedores vd ON v.vendedor_id = vd.id 
+                GROUP BY v.cliente 
+                ORDER BY valor DESC 
+                LIMIT ?
+            `, [top], (err, rows) => {
                 if (err) reject(err);
                 else resolve(rows);
             });

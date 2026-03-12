@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../controllers/authController');
+const JWT_SECRET = process.env.JWT_SECRET || 'secret_central_vendas_123';
 
 function authMiddleware(req, res, next) {
     const token = req.header('Authorization')?.replace('Bearer ', '');

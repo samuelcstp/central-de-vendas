@@ -2,10 +2,17 @@ const VendaRepository = require('../repositories/vendaRepository');
 const DadosPorHoraRepository = require('../repositories/dadosPorHoraRepository');
 const Venda = require('../models/Venda');
 const kpiController = require('./kpiController');
+const VendedorRepository = require('../repositories/vendedorRepository');
 
 const vendaController = {
     async registrar(dadosStrOuObj) {
         const dados = typeof dadosStrOuObj === 'string' ? JSON.parse(dadosStrOuObj) : dadosStrOuObj;
+
+        if (dados.vendedor_id && !dados.vendedor_nome) {
+            const vendedor = await VendedorRepository.buscarPorId(dados.vendedor_id);
+            if (vendedor) dados.vendedor_nome = vendedor.nome;
+        }
+
         const venda = new Venda(dados);
 
         await VendaRepository.salvar(venda);

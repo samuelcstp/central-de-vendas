@@ -39,11 +39,6 @@
         <div class="kpi-value" id="kpi-faturamento">R$ 0</div>
         <div class="kpi-delta" id="delta-faturamento">— aguardando dados</div>
       </div>
-      <div class="kpi-card" id="card-campanhas">
-        <div class="kpi-label">Campanhas Ativas</div>
-        <div class="kpi-value" id="kpi-campanhas">0</div>
-        <div class="kpi-delta" id="delta-campanhas">— aguardando dados</div>
-      </div>
       <div class="kpi-card" id="card-vendas-hoje">
         <div class="kpi-label">Vendas Hoje</div>
         <div class="kpi-value" id="kpi-vendas-hoje">0</div>
@@ -372,8 +367,11 @@
       list.innerHTML = clientes.map((c, i) => `
     <div class="rank-item">
       <span class="rank-num ${i === 0 ? 'gold' : ''}">${medalhas[i] ?? i + 1}</span>
-      <span class="rank-name">${c.nome}</span>
-      <div class="rank-bar-wrap">
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <span class="rank-name">${c.nome}</span>
+        <span style="font-size:0.65rem; color:var(--muted);">${c.vendedor_nome ? '👤 ' + c.vendedor_nome : ''}</span>
+      </div>
+      <div class="rank-bar-wrap" style="margin-left:8px;">
         <div class="rank-bar" style="width:${Math.round((c.valor / maxVal) * 100)}%"></div>
       </div>
       <span class="rank-val">${fmt(c.valor)}</span>
@@ -406,7 +404,7 @@
     <div class="feed-icon" style="background:${cor}22">${venda.emoji ?? '📢'}</div>
     <div class="feed-info">
       <div class="feed-name">${venda.cliente}</div>
-      <div class="feed-sub">${venda.campanha} · ${venda.canal}</div>
+      <div class="feed-sub">${venda.campanha} · ${venda.canal} ${venda.vendedor_nome ? ' · 👤 ' + venda.vendedor_nome : ''}</div>
     </div>
     <div class="feed-value">${fmt(venda.valor)}</div>
   `;
