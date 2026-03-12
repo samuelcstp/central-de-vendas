@@ -1,4 +1,4 @@
-# Central de Vendas — Relatório Técnico
+# Central de Vendas — Dashboard em Tempo Real
 
 ## Visão geral
 Este projeto entrega um dashboard de vendas em tempo real para uma agência de mídia/publicidade. A interface apresenta KPIs, gráfico por hora, ranking de clientes, feed de vendas instantâneo e status de conexão. O backend é Node.js com SQLite e comunicação em tempo real via WebSocket.
@@ -83,13 +83,3 @@ node server.js
 ```
 http://localhost:3000
 ```
-
-## Limitações conhecidas
-- KPI de campanhas ainda não tem regra de cálculo avançada.
-- Banco SQLite local, sem migrações ou versionamento de schema.
-- Sem testes automatizados no momento.
-
-## Próximos passos sugeridos
-- Adicionar seed inicial de dados e ambiente de desenvolvimento.
-- Incluir testes de API e integração do WebSocket.
-- Adicionar validação de payload e logging estruturado.
