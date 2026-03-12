@@ -12,6 +12,7 @@ app.use(router);
 const httpServer = http.createServer(app);
 const wss = new WebSocketServer({ server: httpServer });
 const wsHandler = new WsHandler(wss);
+app.locals.wsHandler = wsHandler; // Salva o wsHandler para ser usado nas rotas
 
 wss.on('connection', (ws) => {
     console.log(`[WS] Cliente conectado. Total: ${wss.clients.size}`);

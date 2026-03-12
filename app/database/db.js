@@ -20,29 +20,44 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Initialize tables
 db.serialize(() => {
+    // Tabela de Vendedores
+    db.run(`
+        CREATE TABLE IF NOT EXISTS vendedores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            senha TEXT NOT NULL,
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    // Tabela de Vendas modificada
     db.run(`
         CREATE TABLE IF NOT EXISTS vendas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vendedor_id INTEGER,
             cliente TEXT NOT NULL,
             campanha TEXT NOT NULL,
             valor REAL NOT NULL,
             canal TEXT NOT NULL,
             emoji TEXT,
-            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (vendedor_id) REFERENCES vendedores(id)
         )
     `);
 
+    // Tabela de KPIs modificada
     db.run(`
         CREATE TABLE IF NOT EXISTS kpis (
             id INTEGER PRIMARY KEY CHECK (id = 1),
             faturamento REAL DEFAULT 0,
             campanhas INTEGER DEFAULT 0,
-            impressoes INTEGER DEFAULT 0,
-            conversoes INTEGER DEFAULT 0,
+            vendas_hoje INTEGER DEFAULT 0,
+            ticket_medio REAL DEFAULT 0,
             delta_faturamento TEXT DEFAULT '',
             delta_campanhas TEXT DEFAULT '',
-            delta_impressoes TEXT DEFAULT '',
-            delta_conversoes TEXT DEFAULT ''
+            delta_vendas_hoje TEXT DEFAULT '',
+            delta_ticket_medio TEXT DEFAULT ''
         )
     `, (err) => {
         if (!err) {

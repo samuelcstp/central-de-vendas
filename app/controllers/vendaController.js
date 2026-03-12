@@ -1,29 +1,37 @@
+const VendaRepository = require('../repositories/vendaRepository');
+const DadosPorHoraRepository = require('../repositories/dadosPorHoraRepository');
 const Venda = require('../models/Venda');
-const DadosPorHora = require('../models/DadosPorHora');
 const kpiController = require('./kpiController');
 
-async function registrar(dados) {
-    const venda = new Venda(dados);
-    await Venda.salvar(venda);
+const vendaController = {
+    async registrar(dadosStrOuObj) {
+        const dados = typeof dadosStrOuObj === 'string' ? JSON.parse(dadosStrOuObj) : dadosStrOuObj;
+        const venda = new Venda(dados);
 
-    await kpiController.onNovaVenda(venda);
+        await VendaRepository.salvar(venda);
 
-    const hora = `${venda.criadoEm.getHours().toString().padStart(2, '0')}h`;
-    await DadosPorHora.atualizar(hora, venda.valor);
+        // Ajusta faturamento por hora
+        const horaAtual = venda.criadoEm.getHours() + "h";
+        await DadosPorHoraRepository.atualizar(horaAtual, venda.valor);
 
-    return venda;
-}
+        // Atualiza KPIs globais
+        await kpiController.onNovaVenda(venda);
 
-async function getRecentes(n = 10) {
-    return await Venda.getRecentes(n);
-}
+        return venda;
+    },
 
-async function getTopClientes(top = 5) {
-    return await Venda.getTopClientes(top);
-}
+    async getRecentes(n = 10) {
+        const vendasData = await VendaRepository.getRecentes(n);
+        return vendasData.map(v => new Venda(v).toJSON());
+    },
 
-async function getPorHora() {
-    return await DadosPorHora.getTodos();
-}
+    async getTopClientes(top = 5) {
+        return await VendaRepository.getTopClientes(top);
+    },
 
-module.exports = { registrar, getRecentes, getTopClientes, getPorHora };
+    async getPorHora() {
+        return await DadosPorHoraRepository.getTodos();
+    }
+};
+
+module.exports = vendaController;

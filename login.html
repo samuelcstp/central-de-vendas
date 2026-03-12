@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Central de Vendas — Login</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Bebas+Neue&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="login-body">
+    <div class="login-container">
+        <div class="logo" style="text-align: center; margin-bottom: 2rem; font-size: 2rem;">
+            Central de <span>Vendas</span>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('login')">Entrar</button>
+            <button class="auth-tab" onclick="switchTab('register')">Cadastrar</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form active-form" onsubmit="handleAuth(event, 'login')">
+            <div class="input-group">
+                <label>E-mail</label>
+                <input type="email" id="loginEmail" required placeholder="vendedor@agencia.com" />
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="loginSenha" required placeholder="••••••••" />
+            </div>
+            <div class="error-msg" id="loginError"></div>
+            <button type="submit" class="btn-primary">Acessar Painel</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form" onsubmit="handleAuth(event, 'register')">
+            <div class="input-group">
+                <label>Nome Completo</label>
+                <input type="text" id="regNome" required placeholder="João Silva" />
+            </div>
+            <div class="input-group">
+                <label>E-mail</label>
+                <input type="email" id="regEmail" required placeholder="joao@agencia.com" />
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="regSenha" required placeholder="Crie uma senha forte" />
+            </div>
+            <div class="error-msg" id="regError"></div>
+            <button type="submit" class="btn-primary">Criar Conta</button>
+        </form>
+    </div>
+
+    <script>
+        // Se já estiver logado, joga pro painel
+        if (localStorage.getItem('token_cv')) {
+            window.location.href = '/index.html';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active-form'));
+
+            if (tab === 'login') {
+                document.querySelectorAll('.auth-tab')[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active-form');
+            } else {
+                document.querySelectorAll('.auth-tab')[1].classList.add('active');
+                document.getElementById('registerForm').classList.add('active-form');
+            }
+        }
+
+        async function handleAuth(e, action) {
+            e.preventDefault();
+
+            const errorMsg = document.getElementById(action === 'login' ? 'loginError' : 'regError');
+            errorMsg.textContent = '';
+
+            let payload = {};
+            if (action === 'login') {
+                payload = {
+                    email: document.getElementById('loginEmail').value,
+                    senha: document.getElementById('loginSenha').value,
+                };
+            } else {
+                payload = {
+                    nome: document.getElementById('regNome').value,
+                    email: document.getElementById('regEmail').value,
+                    senha: document.getElementById('regSenha').value,
+                };
+            }
+
+            try {
+                const res = await fetch(`/api/auth/${action}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erro de autenticação');
+                }
+
+                // Sucesso: salvar token e vendedor
+                localStorage.setItem('token_cv', data.token);
+                localStorage.setItem('vendedor_cv', JSON.stringify(data.vendedor));
+
+                window.location.href = '/index.html';
+
+            } catch (err) {
+                errorMsg.textContent = err.message;
+            }
+        }
+    </script>
+</body>
+
+</html>

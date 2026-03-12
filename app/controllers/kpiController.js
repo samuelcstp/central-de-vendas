@@ -1,17 +1,21 @@
+const KPIRepository = require('../repositories/kpiRepository');
 const KPI = require('../models/KPI');
 
 async function onNovaVenda(venda) {
-    const impressoes = Math.floor(Math.random() * 500 + 100);
-    await KPI.update(venda.valor, 0, impressoes, 1);
+    // Faturamento = venda.valor
+    // Campanhas = 0 (por enquanto não tem regra complexa de campanhas, vamos manter)
+    // Vendas hoje = 1
+    await KPIRepository.update(venda.valor, 0, 1);
 }
 
 async function getKPIs() {
-    const kpi = await KPI.get();
+    const kpiData = await KPIRepository.get();
+    const kpi = new KPI(kpiData);
     return kpi.toJSON();
 }
 
 async function setKPIs(dados) {
-    // Para manter compatibilidade da assinatura da função
+    // Para manter compatibilidade
 }
 
 module.exports = { getKPIs, setKPIs, onNovaVenda };

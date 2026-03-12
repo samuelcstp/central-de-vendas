@@ -21,7 +21,13 @@
       <span id="wsLabel">Desconectado</span>
     </div>
 
-    <div class="header-time" id="clock">--:--:--</div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div class="header-time" id="clock">--:--:--</div>
+      <button onclick="document.getElementById('modalVenda').style.display='flex'" class="btn-primary"
+        style="padding: 8px 16px; margin: 0; font-size: 0.8rem;">+ Registrar Venda</button>
+      <button onclick="logout()" class="btn-primary"
+        style="padding: 8px 16px; margin: 0; font-size: 0.8rem; background: var(--surface); color: var(--text); border: 1px solid var(--border);">Sair</button>
+    </div>
   </header>
 
   <main>
@@ -38,15 +44,15 @@
         <div class="kpi-value" id="kpi-campanhas">0</div>
         <div class="kpi-delta" id="delta-campanhas">— aguardando dados</div>
       </div>
-      <div class="kpi-card" id="card-impressoes">
-        <div class="kpi-label">Impressões / hora</div>
-        <div class="kpi-value" id="kpi-impressoes">0</div>
-        <div class="kpi-delta" id="delta-impressoes">— aguardando dados</div>
+      <div class="kpi-card" id="card-vendas-hoje">
+        <div class="kpi-label">Vendas Hoje</div>
+        <div class="kpi-value" id="kpi-vendas-hoje">0</div>
+        <div class="kpi-delta" id="delta-vendas-hoje">— aguardando dados</div>
       </div>
-      <div class="kpi-card" id="card-conversoes">
-        <div class="kpi-label">Conversões</div>
-        <div class="kpi-value" id="kpi-conversoes">0</div>
-        <div class="kpi-delta" id="delta-conversoes">— aguardando dados</div>
+      <div class="kpi-card" id="card-ticket-medio">
+        <div class="kpi-label">Ticket Médio</div>
+        <div class="kpi-value" id="kpi-ticket-medio">R$ 0</div>
+        <div class="kpi-delta" id="delta-ticket-medio">— aguardando dados</div>
       </div>
     </div>
 
@@ -113,7 +119,94 @@
     </div>
   </main>
 
+  <div id="modalVenda"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999; align-items:center; justify-content:center;">
+    <div class="panel" style="width: 100%; max-width: 400px; position:relative;">
+      <div class="panel-header">
+        <span class="panel-title">Registrar Nova Venda</span>
+        <span style="cursor:pointer; font-family:'DM Mono', monospace; font-size: 1rem; color: var(--muted);"
+          onclick="document.getElementById('modalVenda').style.display='none'">X</span>
+      </div>
+      <form id="formVenda" onsubmit="enviarVenda(event)" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="input-group">
+          <label>Cliente</label>
+          <input type="text" id="vendaCliente" required placeholder="Nome do cliente" />
+        </div>
+        <div class="input-group">
+          <label>Campanha</label>
+          <input type="text" id="vendaCampanha" required placeholder="Ex: Black Friday" />
+        </div>
+        <div class="input-group">
+          <label>Canal</label>
+          <select id="vendaCanal" required>
+            <option value="Instagram">Instagram</option>
+            <option value="YouTube">YouTube</option>
+            <option value="Google Ads">Google Ads</option>
+            <option value="TikTok">TikTok</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="TV">TV</option>
+            <option value="Rádio">Rádio</option>
+            <option value="OOH">OOH</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Valor (R$)</label>
+          <input type="number" step="0.01" id="vendaValor" required placeholder="0.00" />
+        </div>
+        <button type="submit" class="btn-primary">Registrar Venda</button>
+      </form>
+    </div>
+  </div>
+
   <script>
+    if (!localStorage.getItem('token_cv')) {
+      window.location.href = '/login.html';
+    }
+
+    function logout() {
+      localStorage.removeItem('token_cv');
+      localStorage.removeItem('vendedor_cv');
+      window.location.href = '/login.html';
+    }
+
+    async function enviarVenda(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
+      btn.textContent = 'Enviando...';
+      btn.disabled = true;
+
+      const payload = {
+        cliente: document.getElementById('vendaCliente').value,
+        campanha: document.getElementById('vendaCampanha').value,
+        canal: document.getElementById('vendaCanal').value,
+        valor: parseFloat(document.getElementById('vendaValor').value)
+      };
+
+      try {
+        const res = await fetch('/api/vendas', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token_cv')}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Erro ao salvar venda');
+        }
+
+        document.getElementById('formVenda').reset();
+        document.getElementById('modalVenda').style.display = 'none';
+      } catch (err) {
+        alert('Erro: ' + err.message);
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    }
     /* ================================================================
        CENTRAL DE VENDAS — WebSocket Client
        ================================================================ */
@@ -140,6 +233,11 @@
       ws.onopen = () => {
         setStatus('connected', 'Conectado');
         addLog('Conexão estabelecida', 'in');
+
+        const token = localStorage.getItem('token_cv');
+        if (token) {
+          ws.send(JSON.stringify({ type: 'auth', token }));
+        }
       };
 
       ws.onclose = () => {
@@ -245,8 +343,8 @@
 
       set('kpi-faturamento', fmt(kpis.faturamento), 'delta-faturamento', kpis.deltaFaturamento ?? '');
       set('kpi-campanhas', kpis.campanhas, 'delta-campanhas', kpis.deltaCampanhas ?? '');
-      set('kpi-impressoes', fmtNum(kpis.impressoes), 'delta-impressoes', kpis.deltaImpressoes ?? '');
-      set('kpi-conversoes', fmtNum(kpis.conversoes), 'delta-conversoes', kpis.deltaConversoes ?? '');
+      set('kpi-vendas-hoje', fmtNum(kpis.vendasHoje), 'delta-vendas-hoje', kpis.deltaVendasHoje ?? '');
+      set('kpi-ticket-medio', fmt(kpis.ticketMedio), 'delta-ticket-medio', kpis.deltaTicketMedio ?? '');
     }
 
     function renderBarras(porHora) {
