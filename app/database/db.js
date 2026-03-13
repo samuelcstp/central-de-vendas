@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
 
-// Ensure database directory exists
+// verfica se o diretório do database existe
 const dbDir = path.join(__dirname, '..', '..', 'data');
 if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
@@ -31,7 +31,7 @@ db.serialize(() => {
         )
     `);
 
-    // Tabela de Vendas modificada
+    // Tabela de Vendas
     db.run(`
         CREATE TABLE IF NOT EXISTS vendas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,22 +40,19 @@ db.serialize(() => {
             campanha TEXT NOT NULL,
             valor REAL NOT NULL,
             canal TEXT NOT NULL,
-            emoji TEXT,
             criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (vendedor_id) REFERENCES vendedores(id)
         )
     `);
 
-    // Tabela de KPIs modificada
+    // Tabela de KPIs
     db.run(`
         CREATE TABLE IF NOT EXISTS kpis (
             id INTEGER PRIMARY KEY CHECK (id = 1),
             faturamento REAL DEFAULT 0,
-            campanhas INTEGER DEFAULT 0,
             vendas_hoje INTEGER DEFAULT 0,
             ticket_medio REAL DEFAULT 0,
             delta_faturamento TEXT DEFAULT '',
-            delta_campanhas TEXT DEFAULT '',
             delta_vendas_hoje TEXT DEFAULT '',
             delta_ticket_medio TEXT DEFAULT ''
         )

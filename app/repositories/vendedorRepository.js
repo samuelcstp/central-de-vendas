@@ -30,7 +30,7 @@ class VendedorRepository {
 
     static async buscarPorId(id) {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT id, nome, email, criado_em FROM vendedores WHERE id = ?`, [id], (err, row) => {
+            db.get(`SELECT id, nome, email FROM vendedores WHERE id = ?`, [id], (err, row) => {
                 if (err) reject(err);
                 else resolve(row);
             });

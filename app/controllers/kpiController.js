@@ -3,9 +3,8 @@ const KPI = require('../models/KPI');
 
 async function onNovaVenda(venda) {
     // Faturamento = venda.valor
-    // Campanhas = 0 (por enquanto não tem regra complexa de campanhas, vamos manter)
     // Vendas hoje = 1
-    await KPIRepository.update(venda.valor, 0, 1);
+    await KPIRepository.update(venda.valor, 1);
 }
 
 async function getKPIs() {

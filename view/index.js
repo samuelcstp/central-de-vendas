@@ -1,13 +1,16 @@
+// Redireciona para o login se não houver token salvo
 if (!sessionStorage.getItem('token_cv')) {
   window.location.href = '/login.html';
 }
 
+// Encerra sessão local e volta para login
 function logout() {
   sessionStorage.removeItem('token_cv');
   localStorage.removeItem('vendedor_cv');
   window.location.href = '/login.html';
 }
 
+// Envia nova venda via HTTP
 async function enviarVenda(e) {
   e.preventDefault();
   const btn = e.target.querySelector('button[type="submit"]');
@@ -15,6 +18,7 @@ async function enviarVenda(e) {
   btn.textContent = 'Enviando...';
   btn.disabled = true;
 
+  // Monta payload a partir do formulário
   const payload = {
     cliente: document.getElementById('vendaCliente').value,
     campanha: document.getElementById('vendaCampanha').value,
@@ -47,13 +51,11 @@ async function enviarVenda(e) {
   }
 }
 
+// Expõe funções para o HTML
 window.logout = logout;
 window.enviarVenda = enviarVenda;
 
-/* ================================================================
-   CENTRAL DE VENDAS — WebSocket Client
-   ================================================================ */
-
+// URL do WebSocket (mesmo host do servidor HTTP).
 const WS_URL = `ws://${location.host}`;
 
 /* ── RELÓGIO ── */
@@ -64,12 +66,9 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-/* ================================================================
- * WEBSOCKET
- * Conecta ao servidor e reconecta automaticamente se cair.
- * ================================================================ */
 let ws = null;
 
+// Cria a conexão WebSocket e configura eventos
 function conectar() {
   ws = new WebSocket(WS_URL);
 
@@ -93,6 +92,7 @@ function conectar() {
     addLog('Erro na conexão WebSocket', 'out');
   };
 
+  // Aqui o front "ouve" o WebSocket: todo evento recebido passa por este handler.
   ws.onmessage = (event) => {
     let msg;
     try { msg = JSON.parse(event.data); }
@@ -101,6 +101,7 @@ function conectar() {
     switch (msg.type) {
 
       case 'init':
+        // Snapshot inicial do servidor
         if (msg.kpis) renderKPIs(msg.kpis);
         if (msg.porHora) renderBarras(msg.porHora);
         if (msg.topClientes) renderTop(msg.topClientes);
@@ -109,6 +110,7 @@ function conectar() {
         break;
 
       case 'venda':
+        // Evento de nova venda + KPIs atualizados
         if (msg.venda) addFeedItem(msg.venda, true);
         if (msg.kpis) renderKPIs(msg.kpis, true);
         if (msg.topClientes) renderTop(msg.topClientes);
@@ -117,10 +119,12 @@ function conectar() {
         break;
 
       case 'kpis':
+        // Atualização pontual de KPIs
         if (msg.kpis) renderKPIs(msg.kpis, true);
         break;
 
       case 'usuarios':
+        // Contagem de usuários online
         document.getElementById('onlineCount').textContent = msg.count ?? '—';
         addLog(`${msg.count} usuário(s) online`, 'data');
         break;
@@ -128,15 +132,13 @@ function conectar() {
   };
 }
 
-/* ================================================================
-   HELPERS DE UI
-   ================================================================ */
-
+// Atualiza indicador de status do WebSocket
 function setStatus(state, label) {
   document.getElementById('wsDot').className = `ws-dot ${state}`;
   document.getElementById('wsLabel').textContent = label;
 }
 
+// Formata valores monetários
 function fmt(val) {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency', currency: 'BRL',
@@ -144,10 +146,12 @@ function fmt(val) {
   }).format(val);
 }
 
+// Formata números inteiros
 function fmtNum(val) {
   return new Intl.NumberFormat('pt-BR').format(val);
 }
 
+// Adiciona linha no log lateral
 function addLog(msg, tipo) {
   const list = document.getElementById('logList');
   const time = new Date().toLocaleTimeString('pt-BR');
@@ -158,6 +162,7 @@ function addLog(msg, tipo) {
   while (list.children.length > 50) list.removeChild(list.lastChild);
 }
 
+// Anima o KPI com "flash" ao atualizar
 function flashCard(id) {
   const card = document.getElementById(`card-${id}`);
   if (!card) return;
@@ -166,10 +171,8 @@ function flashCard(id) {
   card.classList.add('kpi-flash');
 }
 
-/* ================================================================
-   RENDER FUNCTIONS
-   ================================================================ */
 
+// Renderiza cartões de KPI
 function renderKPIs(kpis, animate = false) {
   const set = (elId, formatted, deltaId, deltaVal) => {
     const el = document.getElementById(elId);
@@ -185,11 +188,11 @@ function renderKPIs(kpis, animate = false) {
   };
 
   set('kpi-faturamento', fmt(kpis.faturamento), 'delta-faturamento', kpis.deltaFaturamento ?? '');
-  set('kpi-campanhas', kpis.campanhas, 'delta-campanhas', kpis.deltaCampanhas ?? '');
   set('kpi-vendas-hoje', fmtNum(kpis.vendasHoje), 'delta-vendas-hoje', kpis.deltaVendasHoje ?? '');
   set('kpi-ticket-medio', fmt(kpis.ticketMedio), 'delta-ticket-medio', kpis.deltaTicketMedio ?? '');
 }
 
+// Renderiza gráfico de barras por hora
 function renderBarras(porHora) {
   const container = document.getElementById('barChart');
   if (!porHora?.length) return;
@@ -207,17 +210,17 @@ function renderBarras(porHora) {
   });
 }
 
+// Renderiza ranking de top clientes
 function renderTop(clientes) {
   const list = document.getElementById('rankList');
   if (!clientes?.length) return;
   const maxVal = Math.max(...clientes.map(c => c.valor), 1);
-  const medalhas = ['🥇', '🥈', '🥉'];
   list.innerHTML = clientes.map((c, i) => `
     <div class="rank-item">
-      <span class="rank-num ${i === 0 ? 'gold' : ''}">${medalhas[i] ?? i + 1}</span>
+      <span class="rank-num ${i === 0 ? 'gold' : ''}">${i + 1}</span>
       <div style="display:flex; flex-direction:column; gap:2px;">
         <span class="rank-name">${c.nome}</span>
-        <span style="font-size:0.65rem; color:var(--muted);">${c.vendedor_nome ? '👤 ' + c.vendedor_nome : ''}</span>
+        <span style="font-size:0.65rem; color:var(--muted);">${c.vendedor_nome ? c.vendedor_nome : ''}</span>
       </div>
       <div class="rank-bar-wrap" style="margin-left:8px;">
         <div class="rank-bar" style="width:${Math.round((c.valor / maxVal) * 100)}%"></div>
@@ -238,6 +241,7 @@ const CORES_CANAL = {
   'OOH': '#39ff85',
 };
 
+// Adiciona item no feed de vendas
 function addFeedItem(venda, animate = true) {
   const feed = document.getElementById('feed');
 
@@ -249,10 +253,9 @@ function addFeedItem(venda, animate = true) {
   item.className = 'feed-item';
   item.style.borderLeft = `3px solid ${cor}`;
   item.innerHTML = `
-    <div class="feed-icon" style="background:${cor}22">${venda.emoji ?? '📢'}</div>
     <div class="feed-info">
       <div class="feed-name">${venda.cliente}</div>
-      <div class="feed-sub">${venda.campanha} · ${venda.canal} ${venda.vendedor_nome ? ' · 👤 ' + venda.vendedor_nome : ''}</div>
+      <div class="feed-sub">${venda.campanha} · ${venda.canal} ${venda.vendedor_nome ? ' · ' + venda.vendedor_nome : ''}</div>
     </div>
     <div class="feed-value">${fmt(venda.valor)}</div>
   `;
@@ -263,5 +266,4 @@ function addFeedItem(venda, animate = true) {
   while (feed.children.length > 50) feed.removeChild(feed.lastChild);
 }
 
-/* ── INICIA ── */
 conectar();

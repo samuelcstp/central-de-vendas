@@ -10,15 +10,14 @@ class KPIRepository {
         });
     }
 
-    static async update(faturamento = 0, campanhas = 0, vendas_hoje = 0) {
+    static async update(faturamento = 0, vendas_hoje = 0) {
         return new Promise((resolve, reject) => {
             db.run(`
                 UPDATE kpis 
                 SET faturamento = faturamento + ?, 
-                    campanhas = campanhas + ?, 
                     vendas_hoje = vendas_hoje + ? 
                 WHERE id = 1
-            `, [faturamento, campanhas, vendas_hoje], function (err) {
+            `, [faturamento, vendas_hoje], function (err) {
                 if (err) reject(err);
                 else {
                     db.run(`UPDATE kpis SET ticket_medio = CASE WHEN vendas_hoje > 0 THEN faturamento / vendas_hoje ELSE 0 END WHERE id = 1`, [], (err2) => {

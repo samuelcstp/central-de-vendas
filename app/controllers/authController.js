@@ -8,10 +8,9 @@ const authController = {
     async register(req, res) {
         const { nome, email, senha } = req.body;
         try {
-            // Removed the check for missing fields as per the provided code
-            // if (!nome || !email || !senha) {
-            //     return res.status(400).json({ error: 'Preencha todos os campos.' });
-            // }
+            if (!nome || !email || !senha) {
+                return res.status(400).json({ error: 'Preencha todos os campos.' });
+            }
 
             const vendedorExistente = await VendedorRepository.buscarPorEmail(email);
             if (vendedorExistente) {
@@ -32,10 +31,6 @@ const authController = {
     async login(req, res) {
         const { email, senha } = req.body;
         try {
-            // Removed the check for missing fields as per the provided code
-            // if (!email || !senha) {
-            //     return res.status(400).json({ error: 'Preencha e-mail e senha.' });
-            // }
 
             const vendedor = await VendedorRepository.buscarPorEmail(email);
             if (!vendedor) {

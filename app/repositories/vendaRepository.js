@@ -3,8 +3,8 @@ const db = require('../database/db');
 class VendaRepository {
     static async salvar(venda) {
         return new Promise((resolve, reject) => {
-            const sql = `INSERT INTO vendas (vendedor_id, cliente, campanha, valor, canal, emoji, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-            db.run(sql, [venda.vendedor_id, venda.cliente, venda.campanha, venda.valor, venda.canal, venda.emoji, venda.criadoEm.toISOString()], function (err) {
+            const sql = `INSERT INTO vendas (vendedor_id, cliente, campanha, valor, canal) VALUES (?, ?, ?, ?, ?)`;
+            db.run(sql, [venda.vendedor_id, venda.cliente, venda.campanha, venda.valor, venda.canal], function (err) {
                 if (err) reject(err);
                 else resolve(this.lastID);
             });

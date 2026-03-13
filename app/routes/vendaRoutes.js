@@ -8,7 +8,7 @@ router.post('/', authMiddleware, async (req, res) => {
         const dados = { ...req.body, vendedor_id: req.vendedor.id, vendedor_nome: req.vendedor.nome };
         const venda = await vendaController.registrar(dados);
 
-        // Emita a venda para os WebSockets usando o event emitter global ou passamos a req
+        // Após salvar a venda via HTTP, dispara broadcast para TODOS os clientes WS conectados.
         if (req.app.locals.wsHandler) {
             req.app.locals.wsHandler.emitirNovaVenda(venda);
         }

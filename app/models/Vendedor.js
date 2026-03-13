@@ -1,10 +1,9 @@
 class Vendedor {
-    constructor({ id, nome, email, criado_em, senha }) {
+    constructor({ id, nome, email, senha }) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.criado_em = criado_em;
     }
 
     toJSON() {
@@ -12,7 +11,6 @@ class Vendedor {
             id: this.id,
             nome: this.nome,
             email: this.email,
-            criado_em: this.criado_em,
         };
     }
 }

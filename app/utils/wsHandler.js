@@ -9,10 +9,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret_central_vendas_123';
 class WsHandler {
     constructor(wss) {
         this.wss = wss;
-        this.usuariosAtivos = new Map(); // ws -> vendedor_id
+        this.usuariosAtivos = new Map(); // ws -> vendedor_id autenticado
     }
 
     async registrar(ws) {
+        // Ao conectar, envia um snapshot inicial só para esse cliente.
         try {
             const kpis = await kpiController.getKPIs();
             const porHora = await vendaController.getPorHora();
@@ -39,6 +40,7 @@ class WsHandler {
 
             if (msg.type === 'auth') {
                 try {
+                    // Cliente envia o token via WS para identificar o vendedor.
                     const decoded = jwt.verify(msg.token, JWT_SECRET);
                     this.usuariosAtivos.set(ws, decoded.id);
                     this.broadcastCountUsuarios();
@@ -48,6 +50,7 @@ class WsHandler {
                 }
             } else if (msg.type === 'venda') {
                 try {
+                    // Venda recebida pelo WS: registra e dispara broadcast para todos.
                     const venda = await vendaController.registrar(msg.venda);
                     await this.emitirNovaVenda(venda);
                 } catch (err) {
@@ -64,6 +67,7 @@ class WsHandler {
 
     broadcastCountUsuarios() {
         const uniqueIds = new Set(this.usuariosAtivos.values());
+        // Broadcast do total de usuários online para todos os clientes conectados.
         this.broadcast({ type: 'usuarios', count: uniqueIds.size });
     }
 
@@ -74,6 +78,7 @@ class WsHandler {
         const topClientesAtualizados = await vendaController.getTopClientes();
         const porHoraAtualizado = await vendaController.getPorHora();
 
+        // Broadcast do evento de venda e KPIs atualizados para TODOS os clientes WS.
         this.broadcast({
             type: 'venda',
             venda: typeof venda.toJSON === 'function' ? venda.toJSON() : venda,
@@ -85,12 +90,14 @@ class WsHandler {
 
     broadcast(payload) {
         const data = JSON.stringify(payload);
+        // Envia para todos os sockets abertos (broadcast real).
         this.wss.clients.forEach(cliente => {
             if (cliente.readyState === OPEN) cliente.send(data);
         });
     }
 
     enviarPara(ws, payload) {
+        // Envio direcionado (apenas um cliente).
         if (ws.readyState === OPEN) ws.send(JSON.stringify(payload));
     }
 }

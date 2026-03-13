@@ -18,7 +18,7 @@ const vendaController = {
         await VendaRepository.salvar(venda);
 
         // Ajusta faturamento por hora
-        const horaAtual = venda.criadoEm.getHours() + "h";
+        const horaAtual = new Date().getHours() + "h";
         await DadosPorHoraRepository.atualizar(horaAtual, venda.valor);
 
         // Atualiza KPIs globais
