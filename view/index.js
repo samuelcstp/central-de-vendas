@@ -92,7 +92,7 @@ function conectar() {
     addLog('Erro na conexão WebSocket', 'out');
   };
 
-  // Aqui o front "ouve" o WebSocket: todo evento recebido passa por este handler.
+  // Aqui o front ouve o WebSocket: todo evento recebido passa por este handler
   ws.onmessage = (event) => {
     let msg;
     try { msg = JSON.parse(event.data); }
@@ -162,7 +162,7 @@ function addLog(msg, tipo) {
   while (list.children.length > 50) list.removeChild(list.lastChild);
 }
 
-// Anima o KPI com "flash" ao atualizar
+// Anima o KPI com flash ao atualizar
 function flashCard(id) {
   const card = document.getElementById(`card-${id}`);
   if (!card) return;
@@ -220,7 +220,7 @@ function renderTop(clientes) {
       <span class="rank-num ${i === 0 ? 'gold' : ''}">${i + 1}</span>
       <div style="display:flex; flex-direction:column; gap:2px;">
         <span class="rank-name">${c.nome}</span>
-        <span style="font-size:0.65rem; color:var(--muted);">${c.vendedor_nome ? c.vendedor_nome : ''}</span>
+        <span style="font-size:0.85rem; color:var(--muted);">Vendedor: ${c.vendedor_nome ? c.vendedor_nome : ''}</span>
       </div>
       <div class="rank-bar-wrap" style="margin-left:8px;">
         <div class="rank-bar" style="width:${Math.round((c.valor / maxVal) * 100)}%"></div>
@@ -255,7 +255,7 @@ function addFeedItem(venda, animate = true) {
   item.innerHTML = `
     <div class="feed-info">
       <div class="feed-name">${venda.cliente}</div>
-      <div class="feed-sub">${venda.campanha} · ${venda.canal} ${venda.vendedor_nome ? ' · ' + venda.vendedor_nome : ''}</div>
+      <div class="feed-sub">${venda.campanha} · ${venda.canal} ${venda.vendedor_nome ? ' ·  Vendedor: ' + venda.vendedor_nome : ''}</div>
     </div>
     <div class="feed-value">${fmt(venda.valor)}</div>
   `;
