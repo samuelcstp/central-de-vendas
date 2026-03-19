@@ -24,24 +24,24 @@ Ponto de entrada da aplicação. Inicializa o Express, cria o servidor HTTP, con
 - `vendaRoutes.js`: expõe `POST /api/vendas` com autenticação JWT.
 - `routes.js`: registra rotas de API e serve arquivos estáticos do frontend.
 
-### Controladores (`app/controllers`)
+### Controllers (`app/controllers`)
 - `authController.js`: registra e autentica vendedores, gerando JWT.
 - `vendaController.js`: processa vendas, persiste no banco, atualiza KPIs e dados por hora.
 - `kpiController.js`: calcula e fornece KPIs agregados.
 
-### Repositórios (`app/repositories`)
+### Repositories (`app/repositories`)
 - `vendedorRepository.js`: CRUD de vendedores e hash de senha.
 - `vendaRepository.js`: persistência de vendas, consultas de recentes e top clientes.
 - `kpiRepository.js`: leitura e atualização das métricas globais.
 - `dadosPorHoraRepository.js`: soma faturamento por hora do dia.
 
-### Modelos (`app/models`)
+### Models (`app/models`)
 - `Vendedor`, `Venda`, `KPI`, `DadosPorHora` padronizam a estrutura dos dados e conversões para JSON.
 
 ### Middleware (`app/middlewares`)
 - `authMiddleware.js`: valida JWT e adiciona o vendedor autenticado ao request.
 
-### Utilitários (`app/utils`)
+### Utils (`app/utils`)
 - `WsHandler`: gerencia conexões WebSocket, autenticação via token, broadcast e envio de dados iniciais.
 - `Notificador`: logger simples para eventos de venda.
 
@@ -57,8 +57,8 @@ Ponto de entrada da aplicação. Inicializa o Express, cria o servidor HTTP, con
 
 ## Autenticação e sessão
 - JWT assinado no backend.
-- Expiração atual: `30m`.
-- O token é guardado no `sessionStorage`, então a sessão termina ao fechar o navegador.
+- Expiração: `30m`.
+- O token é guardado no `sessionStorage`, a sessão termina ao fechar o navegador.
 
 ## Frontend
 - `view/index.html`: dashboard principal.
