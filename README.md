@@ -47,7 +47,7 @@ Ponto de entrada da aplicação. Inicializa o Express, cria o servidor HTTP, con
 
 ### Banco de dados (`app/database/db.js`)
 - Cria e inicializa as tabelas `vendedores`, `vendas`, `kpis`, `dados_por_hora`.
-- Garante o seed do registro único de KPIs.
+- Garante o registro único de KPIs.
 - Armazena o SQLite em `data/data.db`.
 
 ## Fluxos principais
